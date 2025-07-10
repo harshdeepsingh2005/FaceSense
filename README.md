@@ -29,25 +29,39 @@ FaceSense is a real-time facial emotion detection web app powered by deep learni
 
 \`\`\`
 FaceSense/
+
 ├── app.py                         # Flask backend
 
 ├── models/
+
 │   └── emotiondetector.h5        # Trained Keras model
 
 ├── logs/
+
 │   └── emotion_log.jsonl         # Emotion log file (JSONL format)
 
 ├── static/
+
 │   ├── styles.css                # Custom styles
+
 │   ├── script.js                 # Main detection logic
+
 │   ├── analytics.js              # Chart rendering for analytics
+
 │   └── advice.js                 # Scenario-based recommendation logic
+
 ├── templates/
+
 │   ├── index.html                # Home with detection features
+
 │   ├── analytics.html            # Emotion history charts
+
 │   ├── scenario.html             # Scenario selector page
+
 │   └── advice.html               # Advice from emotional patterns
+
 └── README.md
+
 \`\`\`
 
 ---
