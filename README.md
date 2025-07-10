@@ -1,4 +1,3 @@
-cat > README.md << 'EOF'
 # 😃 FaceSense - Facial Emotion Detection AI
 
 FaceSense is a real-time facial emotion detection web app powered by deep learning. It uses a Keras-trained model to classify emotions from webcam or uploaded images and visualizes results with interactive analytics and scenario-based advice.
@@ -137,4 +136,3 @@ University Student | AI Enthusiast
 
 - Dataset: [FER2013 on Kaggle](https://www.kaggle.com/datasets/msambare/fer2013)
 - Paper Inspiration: [arXiv: Real-time Facial Emotion Recognition](https://arxiv.org/abs/2004.09145)
-EOF
