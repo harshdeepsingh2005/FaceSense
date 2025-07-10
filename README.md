@@ -1,155 +1,125 @@
-# 😃 FaceSense - Facial Emotion Detection AI
+# 🎭 FaceSense AI – Real-Time Facial Emotion Recognition with Scenario-Aware Insights
 
-FaceSense is a real-time facial emotion detection web app powered by deep learning. It uses a Keras-trained model to classify emotions from webcam or uploaded images and visualizes results with interactive analytics and scenario-based advice.
+FaceSense is a modular AI-powered facial emotion detection system using deep learning and OpenCV. It supports real-time webcam-based emotion recognition, image upload predictions, and provides scenario-specific advice based on emotion patterns.
 
 ---
 
 ## 🚀 Features
 
-- 📸 Real-time webcam-based emotion detection  
-- 🖼️ Upload image for emotion prediction  
-- 📈 Live analytics dashboard for past detection logs  
-- 🧠 AI-generated advice based on emotional trends  
-- 🧪 Scenario-based emotion simulation (e.g., Interview, Exam)  
-- 🌗 Dark mode toggle, confidence bar, emoji feedback  
-- 🎨 Tailwind CSS responsive UI with smooth transitions  
+- 🔍 Real-time **emotion detection** from webcam and image uploads  
+- 📸 **Live camera feed** with confidence meter and emoji overlay  
+- 📁 Logs emotion data to separate files:  
+  - `live_log.jsonl` (webcam)  
+  - `upload_log.jsonl` (image uploads)  
+- 🎭 **Scenario selection** before live detection (Interview, Exam, Public Speaking, etc.)  
+- 🧠 **Personalized advice page** with emotion chart and context-aware tips  
+- 📊 **Analytics page** with emotion frequency charts and history logs  
+- 📂 **Only latest 5 sessions retained** to reduce log clutter  
+- 💾 **Session-wise filtering** in Analytics and Advice pages  
+- 🌗 Dark mode toggle, animated UI, hover effects, and more  
 
 ---
 
-## 🧰 Tech Stack
+## 🧱 Tech Stack
 
-| Frontend               | Backend    | ML            |
-|------------------------|------------|---------------|
-| HTML5, CSS3, Tailwind  | Flask      | TensorFlow    |
-| JavaScript (Vanilla)   | OpenCV     | Keras (CNN)   |
+- Python (Flask)  
+- TensorFlow/Keras (CNN model)  
+- OpenCV (face detection)  
+- HTML5, Tailwind CSS  
+- JavaScript (Chart.js for graphs)  
 
 ---
 
 ## 📁 Project Structure
 
-\`\`\`
-FaceSense/
-
-├── app.py                         # Flask backend
-
-├── models/
-
-│   └── emotiondetector.h5        # Trained Keras model
-
-├── logs/
-
-│   └── emotion_log.jsonl         # Emotion log file (JSONL format)
-
-├── static/
-
-│   ├── styles.css                # Custom styles
-
-│   ├── script.js                 # Main detection logic
-
-│   ├── analytics.js              # Chart rendering for analytics
-
-│   └── advice.js                 # Scenario-based recommendation logic
-
+```
+emotion_detection/
+├── app.py                    # Flask backend
 ├── templates/
-
-│   ├── index.html                # Home with detection features
-
-│   ├── analytics.html            # Emotion history charts
-
-│   ├── scenario.html             # Scenario selector page
-
-│   └── advice.html               # Advice from emotional patterns
-
-└── README.md
-
-\`\`\`
-
----
-
-## 🧪 Installation
-
-1. Clone the repo:
-\`\`\`bash
-git clone https://github.com/your-username/facesense.git
-cd facesense
-\`\`\`
-
-2. Create a virtual environment:
-\`\`\`bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-\`\`\`
-
-3. Install dependencies:
-\`\`\`bash
-pip install -r requirements.txt
-\`\`\`
-
-4. Add your trained model to:
-\`\`\`
-models/emotiondetector.h5
-\`\`\`
+│   ├── index.html            # Main detection page
+│   ├── scenario.html         # Scenario selection
+│   ├── advice.html           # Emotion advice + chart
+│   └── analytics.html        # Session-wise emotion analysis
+├── static/
+│   ├── styles.css            # Custom UI styles
+│   └── script.js             # Client-side detection + rendering
+├── models/
+│   └── emotiondetector.h5    # Pre-trained CNN model
+├── logs/
+│   ├── live_log.jsonl        # Webcam session logs (max 5 sessions)
+│   └── upload_log.jsonl      # Image upload logs
+```
 
 ---
 
-## ✅ Running the App
+## 🧪 How to Run
 
-\`\`\`bash
+1. **Install dependencies:**
+
+```bash
+pip install flask opencv-python tensorflow
+```
+
+2. **Place your model** in `models/emotiondetector.h5`.
+
+3. **Run the app:**
+
+```bash
 python app.py
-\`\`\`
+```
 
-Then open your browser and navigate to:  
-👉 http://127.0.0.1:5000/
-
----
-
-## 📌 Usage Tips
-
-- Upload a face image or start live webcam to detect emotion.
-- Click **Analytics** to view your emotion detection history.
-- Go to **Advice** to get scenario-aware emotional feedback.
-- Select scenarios like *Exam*, *Interview*, etc., to simulate real-life conditions.
+4. Open [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser.
 
 ---
 
-## 🧠 Model Details
+## 🎯 Advanced Features
 
-- Input: Grayscale face image (48x48)
-- Output: 7 emotion classes (Happy, Sad, Angry, etc.)
-- Based on CNN trained on FER2013 or custom dataset
-
----
-
-## 📦 Requirements
-
-\`\`\`txt
-flask
-opencv-python
-tensorflow
-numpy
-\`\`\`
-
-Generate with:
-\`\`\`bash
-pip freeze > requirements.txt
-\`\`\`
+- **Session-Based Advice:** Each webcam session is tagged with a UUID and scenario. The `/advice.html` page analyzes the dominant emotion for the selected session.
+- **Scenario-Aware Tips:** Advice adapts based on the context (Interview, Exam, Public Speaking, etc.).
+- **Live Analytics Filtering:** Users can filter by:
+  - `Source` (upload / webcam)
+  - `Session ID` (latest 5 only)
 
 ---
 
-## 📜 License
+## 🗃 Example Session Log
 
-This project is licensed under the MIT License.
+```json
+{
+  "timestamp": "2025-07-10 20:22:13",
+  "source": "webcam",
+  "emotion": "Fear",
+  "confidence": 0.91,
+  "session_id": "a8123e32-4cc5-4d82-9442-7f2e7a705ccc",
+  "scenario": "interview"
+}
+```
 
 ---
 
-## 🙋‍♂️ Author
+## 📌 Notes
 
-**Harshdeep Singh**  
-University Student | AI Enthusiast
+- Sessions are pruned to retain **only the latest 5**, automatically.
+- All logs are stored in `.jsonl` format (1 JSON object per line).
+- Make sure to select a **scenario before starting live detection**.
+- For local analytics, `localStorage` may cache old results — clear it to refresh history.
 
 ---
 
-## 🌐 Links
+## 📷 Screenshots (Optional)
 
-- Dataset: [FER2013 on Kaggle](https://www.kaggle.com/datasets/msambare/fer2013)
-- Paper Inspiration: [arXiv: Real-time Facial Emotion Recognition](https://arxiv.org/abs/2004.09145)
+_You can add screenshots here showing the detection, scenario selection, and advice interfaces._
+
+---
+
+## 🤝 Contributors
+
+- Harshdeep Singh, Vaibhav Mohanty and Aditya Vardhan
+- Model credit: FER2013
+  
+---
+
+## 📄 License
+
+MIT License – free to use, modify, and distribute.
+
