@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analytics - FaceSense</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-100 to-blue-100 text-gray-800 min-h-screen p-6">
+
+  <div class="max-w-6xl mx-auto bg-white p-6 rounded-xl shadow-lg">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold text-indigo-700">Emotion Analytics</h1>
+      <div class="flex items-center space-x-4">
+        <a href="/" class="text-sm bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">← Back to Detection</a>
+        <a href="/advice.html" class="text-sm bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">💡 General Advice</a>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Filter by Source:</label>
+        <select id="sourceFilter" class="mt-1 w-full border px-3 py-2 rounded text-sm">
+          <option value="all">All</option>
+          <option value="upload">Upload</option>
+          <option value="webcam">Webcam</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Session ID (Last 5):</label>
+        <select id="sessionFilter" class="mt-1 w-full border px-3 py-2 rounded text-sm">
+          <option value="">All Sessions</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <canvas id="emotionChart" class="mb-10 max-h-80"></canvas>
+
+    <!-- Emotion Log Table -->
+    <div class="overflow-x-auto">
+      <h2 class="text-xl font-semibold mb-2">Recent Emotion History</h2>
+      <table class="w-full table-auto text-sm text-left border rounded shadow">
+        <thead class="bg-indigo-100">
+          <tr>
+            <th class="px-4 py-2 border">Time</th>
+            <th class="px-4 py-2 border">Emotion</th>
+            <th class="px-4 py-2 border">Confidence</th>
+            <th class="px-4 py-2 border">Source</th>
+            <th class="px-4 py-2 border">Scenario</th>
+            <th class="px-4 py-2 border">Advice</th>
+          </tr>
+        </thead>
+        <tbody id="logTable" class="bg-white text-gray-700"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let allLogs = [];
+
+    async function fetchLogs() {
+      const logs = [];
+      const sources = ['live_log.jsonl', 'upload_log.jsonl'];
+
+      for (const src of sources) {
+        try {
+          const res = await fetch(`/logs/${src}`);
+          const text = await res.text();
+          const lines = text.trim().split("\n");
+          for (const line of lines) {
+            const entry = JSON.parse(line);
+            logs.push(entry);
+          }
+        } catch (err) {
+          console.error(`Failed to load ${src}`, err);
+        }
+      }
+
+      return logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    }
+
+    async function loadSessionDropdown() {
+      try {
+        const res = await fetch('/get_sessions');
+        const sessions = await res.json();
+        const sessionFilter = document.getElementById("sessionFilter");
+        sessionFilter.innerHTML = `<option value="">All Sessions</option>`;
+        sessions.forEach(s =>
+          sessionFilter.innerHTML += `<option value="${s.session_id}">${s.session_id} (${s.scenario})</option>`
+        );
+      } catch (err) {
+        console.error("Failed to load sessions:", err);
+      }
+    }
+
+    function renderTable(logs) {
+      const table = document.getElementById("logTable");
+      table.innerHTML = "";
+      for (const log of logs) {
+        const encodedTime = encodeURIComponent(log.timestamp);
+        const row = `
+          <tr>
+            <td class="border px-4 py-2">${log.timestamp}</td>
+            <td class="border px-4 py-2">${log.emotion}</td>
+            <td class="border px-4 py-2">${(log.confidence * 100).toFixed(2)}%</td>
+            <td class="border px-4 py-2 capitalize">${log.source}</td>
+            <td class="border px-4 py-2">${log.scenario || "—"}</td>
+            <td class="border px-4 py-2">
+              <a href="/advice.html?timestamp=${encodedTime}" class="text-indigo-600 hover:underline text-sm">Advice →</a>
+            </td>
+          </tr>
+        `;
+        table.innerHTML += row;
+      }
+    }
+
+    function renderChart(logs) {
+      const emotionCounts = {};
+      for (const log of logs) {
+        emotionCounts[log.emotion] = (emotionCounts[log.emotion] || 0) + 1;
+      }
+
+      const ctx = document.getElementById('emotionChart').getContext('2d');
+      if (window.emotionChart) window.emotionChart.destroy(); // destroy previous
+      window.emotionChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(emotionCounts),
+          datasets: [{
+            label: 'Emotion Frequency',
+            data: Object.values(emotionCounts),
+            backgroundColor: '#6366F1'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            tooltip: { enabled: true },
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1 }
+            }
+          }
+        }
+      });
+    }
+
+    function applyFilter() {
+      const source = document.getElementById("sourceFilter").value;
+      const session = document.getElementById("sessionFilter").value;
+
+      let filtered = [...allLogs];
+      if (source !== "all") {
+        filtered = filtered.filter(log => log.source === source);
+      }
+      if (session) {
+        filtered = filtered.filter(log => log.session_id === session);
+      }
+
+      renderTable(filtered);
+      renderChart(filtered);
+    }
+
+    window.onload = async () => {
+      allLogs = await fetchLogs();
+      await loadSessionDropdown();
+      applyFilter();
+    };
+
+    document.getElementById("sourceFilter").addEventListener("change", applyFilter);
+    document.getElementById("sessionFilter").addEventListener("change", applyFilter);
+  </script>
+</body>
+</html>

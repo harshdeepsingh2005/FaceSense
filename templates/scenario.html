@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Select Scenario - FaceSense</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 to-blue-100 text-gray-800 flex flex-col justify-center items-center min-h-screen transition-all duration-300">
+
+  <!-- Logo or Icon -->
+  <div class="mb-6 text-indigo-600">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M15 10l4.553-2.276A2 2 0 0020 6.382V5a2 2 0 00-2-2h-4.382a2 2 0 00-1.342.553L10 5m5 5l-4.553 2.276A2 2 0 0110 17.618V19a2 2 0 002 2h4.382a2 2 0 001.342-.553L20 19m-5-9v4m0 0v4m0-4h4m-4 0H9" />
+    </svg>
+    <h1 class="text-3xl font-extrabold mt-2">FaceSense AI</h1>
+  </div>
+
+  <!-- Scenario Card -->
+  <div class="bg-white shadow-lg rounded-lg p-8 max-w-lg w-full text-center animate-fade-in">
+    <h2 class="text-2xl font-bold text-indigo-700 mb-4">Select a Scenario</h2>
+    <p class="text-gray-600 mb-6">Choose a context to simulate. Your emotion data will be analyzed within this scenario.</p>
+
+    <!-- Dropdown -->
+    <select id="scenarioSelect" class="w-full px-4 py-2 border rounded text-gray-700 mb-4 focus:ring-indigo-500">
+      <option value="default">Default (No Specific Context)</option>
+      <option value="interview">💼 Job Interview - Simulate interview stress or confidence</option>
+      <option value="exam">📚 Exam/Test - Measure anxiety or focus levels</option>
+      <option value="public">🎤 Public Speaking - Observe stage presence emotions</option>
+    </select>
+
+    <p class="text-sm text-gray-500 italic mb-6">You can change your scenario anytime by returning to this page.</p>
+
+    <!-- Start Button -->
+    <button onclick="startDetection()" class="mt-2 bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+      Start Detection →
+    </button>
+  </div>
+
+  <!-- Footer Badge -->
+  <div class="fixed bottom-4 right-4 bg-indigo-100 text-indigo-600 px-4 py-1 rounded-full text-sm shadow">
+    FaceSense v1.0
+  </div>
+
+  <!-- Script -->
+  <script>
+    async function startDetection() {
+      const selected = document.getElementById('scenarioSelect').value;
+      localStorage.setItem('selectedScenario', selected); // Store on client for JS use
+
+      try {
+        // Start session with backend (important!)
+        const res = await fetch("/start_session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ scenario: selected })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          localStorage.setItem("currentSessionId", data.session_id); // For frontend tracking (optional)
+          window.location.href = "/";
+        } else {
+          alert("Failed to start session.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error starting session.");
+      }
+    }
+  </script>
+
+  <!-- Fade-in animation -->
+  <style>
+    .animate-fade-in {
+      animation: fadeIn 0.8s ease-out both;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Emotion-Based Advice - FaceSense</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 to-blue-100 min-h-screen text-gray-800 p-6">
+
+  <div class="max-w-4xl mx-auto bg-white rounded-lg shadow p-6 space-y-6">
+    <header class="flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-indigo-700">🧠 Personalized Emotion Advice</h1>
+      <a href="/" class="text-sm text-indigo-600 hover:underline">← Back to Detection</a>
+    </header>
+
+    <!-- Session Selection -->
+    <div>
+      <label for="sessionSelect" class="block mb-2 text-sm font-medium text-gray-700">Select a session:</label>
+      <select id="sessionSelect" class="w-full px-4 py-2 border rounded text-gray-700 mb-4 focus:ring-indigo-500">
+        <option disabled selected>Loading session list...</option>
+      </select>
+    </div>
+
+    <section id="summary" class="space-y-2">
+      <p class="text-sm text-gray-600">Analyzing your selected emotional session for insights...</p>
+      <p class="text-base font-medium">Scenario: <span id="scenario" class="font-semibold text-indigo-600">-</span></p>
+      <p class="text-base font-medium">Dominant Emotion: <span id="dominant" class="font-semibold text-indigo-600">-</span></p>
+    </section>
+
+    <div class="mt-6">
+      <canvas id="emotionPatternChart" height="150"></canvas>
+    </div>
+
+    <section id="adviceSection" class="mt-6">
+      <h2 class="text-xl font-semibold mb-2 text-indigo-700">💡 Advice</h2>
+      <div id="adviceText" class="text-gray-700 text-base leading-relaxed">Please select a session to view advice.</div>
+    </section>
+  </div>
+
+  <script>
+    const sessionSelect = document.getElementById("sessionSelect");
+    const adviceText = document.getElementById("adviceText");
+    const scenarioSpan = document.getElementById("scenario");
+    const dominantSpan = document.getElementById("dominant");
+    let chartInstance;
+
+    async function loadSessions() {
+      try {
+        const res = await fetch('/get_sessions');
+        const sessions = await res.json();
+        sessionSelect.innerHTML = sessions.map(s =>
+          `<option value="${s.session_id}">${s.session_id} (${s.scenario})</option>`
+        ).join("");
+      } catch (err) {
+        sessionSelect.innerHTML = "<option disabled>Error loading sessions</option>";
+      }
+    }
+
+    sessionSelect.addEventListener("change", async (e) => {
+      const sessionId = e.target.value;
+      try {
+        const res = await fetch(`/get_session_logs/${sessionId}`);
+        const logs = await res.json();
+
+        const emotions = {};
+        const scenario = logs[0]?.scenario || "default";
+
+        logs.forEach(log => {
+          emotions[log.emotion] = (emotions[log.emotion] || 0) + 1;
+        });
+
+        const dominant = Object.entries(emotions).sort((a, b) => b[1] - a[1])[0][0] || "Neutral";
+        scenarioSpan.textContent = scenario.charAt(0).toUpperCase() + scenario.slice(1);
+        dominantSpan.textContent = dominant;
+
+        // Update chart
+        if (chartInstance) chartInstance.destroy();
+        const ctx = document.getElementById("emotionPatternChart").getContext("2d");
+        chartInstance = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: Object.keys(emotions),
+            datasets: [{
+              label: "Emotion Frequency",
+              data: Object.values(emotions),
+              backgroundColor: "#6366F1"
+            }]
+          },
+          options: {
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, stepSize: 1 } }
+          }
+        });
+
+        // Show advice
+        const text = getAdviceForEmotionAndScenario(dominant, scenario);
+        adviceText.textContent = text;
+
+      } catch (err) {
+        console.error(err);
+        adviceText.textContent = "Unable to fetch logs or analyze session.";
+      }
+    });
+
+    function getAdviceForEmotionAndScenario(emotion, scenario) {
+      const adviceMap = {
+        default: {
+          Happy: "Keep up the positivity! You're in a great state of mind.",
+          Sad: "Take breaks and try mindfulness or light activity to uplift yourself.",
+          Angry: "Pause and reflect. Deep breathing can help calm your mind.",
+          Fear: "Try grounding exercises or talk to someone you trust.",
+          Surprise: "Stay focused—unexpected emotions can pass quickly.",
+          Disgust: "Consider what's triggering discomfort. Address it constructively.",
+          Neutral: "Stable mood detected. Maintain your current routine!"
+        },
+        interview: {
+          Happy: "Your confidence shows! Stay calm and continue with clarity.",
+          Fear: "Practice mock interviews to build confidence and reduce fear.",
+          Neutral: "Maintain eye contact and speak with intention.",
+          Angry: "Interview nerves? Relax and breathe deeply before responding."
+        },
+        exam: {
+          Sad: "Try taking short breaks and return refreshed.",
+          Fear: "Review key topics calmly and sleep well before the test.",
+          Neutral: "Keep steady—you're doing well.",
+          Happy: "You seem confident—use this energy wisely!"
+        },
+        public: {
+          Surprise: "Unexpected moments? Focus back on your audience.",
+          Fear: "Breathe deeply, speak slowly, and focus on connecting.",
+          Happy: "Great energy! Let your enthusiasm shine.",
+          Sad: "Try smiling a bit more—it helps shift your mood."
+        }
+      };
+      return (adviceMap[scenario]?.[emotion]) || adviceMap["default"][emotion] || "Stay balanced and aware of your emotions.";
+    }
+
+    loadSessions();
+  </script>
+</body>
+</html>
