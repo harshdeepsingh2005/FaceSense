@@ -114,7 +114,7 @@ _You can add screenshots here showing the detection, scenario selection, and adv
 
 ## 🤝 Contributors
 
-- Harshdeep Singh, Vaibhav Mohanty and Aditya Vardhan
+- Harshdeep Singh, Vaibhav Mohanty, Kirti Thakur and Aditya Vardhan
 - Model credit: FER2013
   
 ---
