@@ -108,9 +108,13 @@ python app.py
 
 ---
 
-## 📷 Screenshots (Optional)
+## 📷 Screenshots 
 
-_You can add screenshots here showing the detection, scenario selection, and advice interfaces._
+![Confusion matrix](https://github.com/user-attachments/assets/762bf7b3-c9b1-483e-a480-e1e7a0a37e08)
+
+![ROC curve](https://github.com/user-attachments/assets/1a7410ab-ed80-4950-af6d-6265c0ed0220)
+
+![Classification report](https://github.com/user-attachments/assets/397b67c4-4bc1-48f8-8dca-aac01971b955)
 
 ---
 
