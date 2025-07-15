@@ -765,3 +765,5 @@
 {"timestamp": "2025-07-11 05:25:05", "source": "webcam", "emotion": "Happy", "confidence": 0.5, "session_id": "4b4fd29a-8b4a-413d-87f2-bd2a4a13ae1e", "scenario": "Default"}
 {"timestamp": "2025-07-11 05:25:05", "source": "webcam", "emotion": "Happy", "confidence": 0.67, "session_id": "4b4fd29a-8b4a-413d-87f2-bd2a4a13ae1e", "scenario": "Default"}
 {"timestamp": "2025-07-11 05:25:05", "source": "webcam", "emotion": "Happy", "confidence": 0.56, "session_id": "4b4fd29a-8b4a-413d-87f2-bd2a4a13ae1e", "scenario": "Default"}
+{"timestamp": "2025-07-11 23:51:11", "source": "webcam", "emotion": "Sad", "confidence": 0.37, "session_id": "f60ab026-62f1-4ab3-9924-e3a54e520000", "scenario": "interview"}
+{"timestamp": "2025-07-11 23:51:14", "source": "webcam", "emotion": "Sad", "confidence": 0.42, "session_id": "f60ab026-62f1-4ab3-9924-e3a54e520000", "scenario": "interview"}
