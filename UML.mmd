@@ -1,0 +1,34 @@
+sequenceDiagram
+    participant User
+    participant WebInterface
+    participant FlaskBackend
+    participant OpenCV
+    participant CNNModel
+    participant SessionManager
+    participant JSONLStorage
+
+    User->>WebInterface: Select Scenario & Start Session
+    WebInterface->>FlaskBackend: Initialize Session Request
+    FlaskBackend->>SessionManager: Generate UUID
+    SessionManager->>JSONLStorage: Create Session Entry
+
+    User->>WebInterface: Provide Webcam/Image Input
+    WebInterface->>FlaskBackend: Send Image Frame
+    FlaskBackend->>OpenCV: Face Detection
+    OpenCV-->>FlaskBackend: Face Coordinates
+    FlaskBackend->>CNNModel: Emotion Classification
+    CNNModel-->>FlaskBackend: Emotion + Confidence
+
+    FlaskBackend->>SessionManager: Log Emotion Data
+    SessionManager->>JSONLStorage: Store Session Data
+    FlaskBackend-->>WebInterface: Emotion Result + Advice
+    WebInterface-->>User: Display Emotion & Analytics
+
+    Note over SessionManager, JSONLStorage: Auto-prune old sessions\n(keep latest 5)
+
+    User->>WebInterface: Request Analytics
+    WebInterface->>FlaskBackend: Get Session Analytics
+    FlaskBackend->>JSONLStorage: Retrieve Historical Data
+    JSONLStorage-->>FlaskBackend: Emotion Patterns
+    FlaskBackend-->>WebInterface: Analytics + Visualizations
+    WebInterface-->>User: Display Charts & Insights

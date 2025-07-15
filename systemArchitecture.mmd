@@ -1,0 +1,34 @@
+graph TB
+    subgraph "Presentation Layer"
+        A[Web Interface] --> B[HTML5/CSS3/JS]
+        B --> C[Chart.js Visualization]
+        B --> D[WebSocket Client]
+    end
+    
+    subgraph "Application Layer"
+        E[Flask Backend] --> F[Emotion Detection API]
+        F --> G[CNN Model TensorFlow/Keras]
+        F --> H[OpenCV Face Detection]
+        E --> I[Session Management]
+        E --> J[Analytics Engine]
+    end
+    
+    subgraph "Data Layer"
+        K[JSONL Session Storage] --> L[Emotion Logs]
+        K --> M[Analytics Data]
+    end
+    
+    subgraph "External Input"
+        N[Webcam Feed] --> O[Image Upload]
+    end
+    
+    A --> E
+    D --> E
+    N --> F
+    O --> F
+    I --> K
+    J --> K
+    
+    style A fill:#e1f5fe
+    style E fill:#f3e5f5
+    style K fill:#e8f5e8
